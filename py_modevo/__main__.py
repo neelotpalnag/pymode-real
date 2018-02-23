@@ -6,7 +6,6 @@ from . import initialization
 
 
 def main():
-
     # Parameters specific to Differential Evolution
     population_size = 0
     max_generations = 0
@@ -22,7 +21,7 @@ def main():
     # F[1] = x[0] - x[1]
 
     X_init = initialization(X_hi, X_lo, population_size)
-
+    print(X_init)
 
 
 if __name__ == "__main__":
