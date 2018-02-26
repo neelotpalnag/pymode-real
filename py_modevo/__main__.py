@@ -22,22 +22,50 @@ def main():
     # STEP 1: Generate the INITIAL POPULATION
     X_init = initialize(X_hi, X_lo, population_size)
 
-    # Proceed with multi-objective optimization only if num_objectives >=2
-    if num_ojectives >= 2:
-        pass
+    if secure_expression_check(F) is True:
+        # Proceed with multi-objective optimization only if num_objectives >=2
+        if num_ojectives >= 2:
+            pass
 
-    else:
-        X = X_init
-        for i in range(0, max_generations, 1):
-            # STEP 2: Mutation
-            X_mutated = mutate(X, X_hi, X_lo, population_size)
+        # Proceed with Single-Objective Optimization if um_objectives = 1
+        else:
+            X = X_init
+            for i in range(0, max_generations, 1):
+                # STEP 2: Mutation
+                X_mutated = mutate(X, X_hi, X_lo, population_size)
 
-            # STEP 3: Crossover
-            X_Crossed = cross_binary(X, X_mutated, crossover_prob, X_hi, X_lo, population_size)
+                # STEP 3: Crossover
+                X_Crossed = cross_binary(X, X_mutated, crossover_prob, X_hi, X_lo, population_size)
 
-            # STEP 4: Selection
-            X = selection(X_Crossed, X)
+                # STEP 4: Selection
+                X = selection(F, X_Crossed, X, population_size)
 
+            print(str(max_generations) + " generations ended. Computing result ..")
+
+
+
+def secure_expression_check(F):
+    # list of safe methods
+    safe_list = ['acos', 'asin', 'atan', 'atan2', 'ceil', 'cos',
+                 'cosh', 'degrees', 'e', 'exp', 'fabs', 'floor',
+                 'fmod', 'frexp', 'hypot', 'ldexp', 'log', 'log10',
+                 'modf', 'pi', 'pow', 'radians', 'sin', 'sinh', 'sqrt',
+                 'tan', 'tanh']
+    for i in F:
+        for j in safe_list:
+            if j in i:
+                print("Insecure Expression. Please use operators only from the following list:")
+                print("acos, asin, atan, atan2, ceil, cos,\n"
+                 +"cosh, degrees, e, exp, fabs, floor,\n"
+                 +"fmod, frexp, hypot, ldexp, log, log10,\n"
+                 + "modf, pi, pow, radians, sin, sinh, sqrt,\n"
+                 + "tan, tanh\n")
+                print("TERMINATING..")
+                return False
+
+    print("Secure Expressions found. Proceeding .. ")
+    return True
+            
 
 if __name__ == "__main__":
     main()
