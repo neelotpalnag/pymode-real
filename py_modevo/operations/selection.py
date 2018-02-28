@@ -2,9 +2,9 @@ def selection(F, X_trial, X_target, pop_size):
     X_sel = [[0 for x in range(len(X_trial))] for y in range(pop_size)]
     for i in range(0, pop_size, 1):
         X = X_trial
-        trial_F_val = eval(F)
+        trial_F_val = eval(F[0])
         X = X_target
-        target_F_val = eval(F)
+        target_F_val = eval(F[0])
         if trial_F_val < target_F_val:
             X_sel[i] = X_trial[i]
         else:
