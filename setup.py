@@ -7,5 +7,5 @@ setup(name='py_modevo',
           'console_scripts': [
               'py_modevo = py_modevo.__main__.main'
           ]
-      },
+      }, install_requires=['py-pareto-gen']
       )
