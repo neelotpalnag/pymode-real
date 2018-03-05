@@ -64,26 +64,27 @@ class Optimizer:
 
 
     def secure_expression_check(self):
-        # list of safe methods
-        safe_list = ['acos', 'asin', 'atan', 'atan2', 'ceil', 'cos',
-                     'cosh', 'degrees', 'e', 'exp', 'fabs', 'floor',
-                     'fmod', 'frexp', 'hypot', 'ldexp', 'log', 'log10',
-                     'modf', 'pi', 'pow', 'radians', 'sin', 'sinh', 'sqrt',
-                     'tan', 'tanh']
-        for i in self.F:
-            for j in safe_list:
-                if j in i:
-                    print("Insecure Expression. Please use operators only from the following list:")
-                    print("acos, asin, atan, atan2, ceil, cos,\n"
-                     +"cosh, degrees, e, exp, fabs, floor,\n"
-                     +"fmod, frexp, hypot, ldexp, log, log10,\n"
-                     + "modf, pi, pow, radians, sin, sinh, sqrt,\n"
-                     + "tan, tanh\n")
-                    print("TERMINATING..")
-                    return False
-
-        print("Secure Expressions found. Proceeding .. ")
         return True
+        # list of safe methods
+        # safe_list = ['acos', 'asin', 'atan', 'atan2', 'ceil', 'cos',
+        #              'cosh', 'degrees', 'e', 'exp', 'fabs', 'floor',
+        #              'fmod', 'frexp', 'hypot', 'ldexp', 'log', 'log10',
+        #              'modf', 'pi', 'pow', 'radians', 'sin', 'sinh', 'sqrt',
+        #              'tan', 'tanh']
+        # for i in self.F:
+        #     for j in safe_list:
+        #         if j in i:
+        #             print("Insecure Expression. Please use operators only from the following list:")
+        #             print("acos, asin, atan, atan2, ceil, cos,\n"
+        #              +"cosh, degrees, e, exp, fabs, floor,\n"
+        #              +"fmod, frexp, hypot, ldexp, log, log10,\n"
+        #              + "modf, pi, pow, radians, sin, sinh, sqrt,\n"
+        #              + "tan, tanh\n")
+        #             print("TERMINATING..")
+        #             return False
+        #
+        # print("Secure Expressions found. Proceeding .. ")
+        # return True
 
 
 # Un-comment the following code to test: 
