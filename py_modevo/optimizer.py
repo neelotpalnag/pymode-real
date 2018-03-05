@@ -11,10 +11,10 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .operations.initialization import initialize
-from .operations.mutation import mutate
-from .operations.crossover_binary import cross_binary
-from .operations.selection import selection
+from operations.initialization import initialize
+from operations.mutation import mutate
+from operations.crossover_binary import cross_binary
+from operations.selection import selection
 
 # Specify the Objective Functions in a Matrix format
 # For objective function matrix F(x) = [F1(x), F2(x) ... Fk(x)], where x = [x1, x2,x3 ..., xn]
@@ -27,12 +27,12 @@ class Optimizer:
         # Initialize all these
         self.population_size = 10   # Default = 10
         self.max_generations = 100  # Default = 100
-        self.num_objectives = 0     # Must be set by user
-        self.num_params = 0         # Must be set by user
+        self.num_objectives = 1     # Must be set by user
+        self.num_params = 2         # Must be set by user
 
-        self.F = [" "]              # Must be set by user
-        self.X_hi = [0, 0]          # Must be set by user
-        self.X_lo = [0, 0]          # Must be set by user
+        self.F = [" ",]              # List of Objective Functions   #   Must be set by user
+        self.X_hi = [0, 0]          # List of Upper bounds of Xi's  #   Must be set by user
+        self.X_lo = [0, 0]          # List of Lower bounds of Xi's  #   Must be set by user
 
         self.crossover_prob = 0.3   # Default  = 0.3 ; Increase to 0.9 for quick convergence, or else to 0.1
 
@@ -41,8 +41,8 @@ class Optimizer:
         # STEP 1: Generate the INITIAL POPULATION
         X_init = initialize(self.X_hi, self.X_lo, self.population_size)
 
-        if self.secure_expression_check(self.F) is True:
-            if self.num_ojectives >= 2:
+        if self.secure_expression_check() is True:
+            if self.num_objectives >= 2:
                 # Proceed with multi-objective optimization only if num_objectives >=2
                 pass
 
@@ -54,10 +54,10 @@ class Optimizer:
                     X_mutated = mutate(X_evo, self.X_hi, self.X_lo, self.population_size)
 
                     # STEP 3: Crossover
-                    X_Crossed = cross_binary(X_evo, X_mutated, self.crossover_prob, self.X_hi, self.X_lo, self.population_size)
+                    X_crossed = cross_binary(X_evo, X_mutated, self.crossover_prob, self.X_hi, self.X_lo, self.population_size)
 
                     # STEP 4: Selection
-                    X_evo = selection(self.F, X_Crossed, X_evo, self.population_size)
+                    X_evo = selection(self.F, X_crossed, X_evo, self.population_size)
 
                 print(str(self.max_generations) + " generations ended. Computing result ..")
                 print(X_evo)
@@ -84,3 +84,20 @@ class Optimizer:
 
         print("Secure Expressions found. Proceeding .. ")
         return True
+
+
+# Un-comment the following code to test: 
+# def main():
+#     op = Optimizer()
+#     op.population_size = 10
+#     op.max_generations = 1000
+#     op.num_params = 5
+#     op.num_objectives = 1
+#     op.F = ["X[0] + X[1] + X[2] + X[3] + X[4]"]
+#     op.X_lo = [-3, 3, -3, 3, -9]
+#     op.X_hi = [100, 80, 100, 120, 80]
+#
+#     op.solve()
+#
+# if __name__ == '__main__':
+#     main()

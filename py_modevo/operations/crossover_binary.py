@@ -12,15 +12,15 @@ def cross_binary(X, V, cr, X_hi, X_lo, pop_size):
     # pop_size : Population Size
 
     num_vars = len(X_hi)
-    X_cros = [[0 for x in range(len(X_hi))] for y in range(pop_size)]
+    X_cross = [[0 for x in range(len(X_hi))] for y in range(pop_size)]
 
     for i in range(0, pop_size, 1):
-        j_rand = math.ceil(random.uniform(0, 1) * num_vars) if j_rand != 0 else math.ceil(
-            random.uniform(0, 1) * num_vars) + 1
+        rand = math.ceil(random.uniform(0, 1) * num_vars)
+        j_rand = rand if rand!= 0 else rand+1
         for j in range(0, num_vars, 1):
             if cr > random.uniform(0, 1) or j == j_rand:
-                X_cros[i][j] = V[i][j]
+                X_cross[i][j] = V[i][j]
             else:
-                X_cros[i][j] = X[i][j]
+                X_cross[i][j] = X[i][j]
 
-    return X_cros
+    return X_cross

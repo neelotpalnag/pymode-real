@@ -16,7 +16,7 @@ def mutate(X, X_hi, X_lo, pop_size):
     for i in range(0, pop_size, 1):
         for j in range(0, num_vars, 1):
             rn_int = get_distinct_rn_int(num_vars)
-            val = X[rn_int[0]] + F * (X[rn_int[1]] - X[rn_int[2]])
+            val = X[i][rn_int[0]] + F * (X[i][rn_int[1]] - X[i][rn_int[2]])
             if val > X_hi[j]:
                 X_mut[i][j] = X_hi[j]
             elif val < X_lo[j]:
@@ -42,4 +42,4 @@ def get_distinct_rn_int(cap):
         if rn3 == 0:
             rn3 = rn3 + 1
 
-    return [rn1, rn2, rn3]
+    return [rn1-1, rn2-1, rn3-1]
