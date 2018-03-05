@@ -60,7 +60,21 @@ class Optimizer:
                     X_evo = selection(self.F, X_crossed, X_evo, self.population_size)
 
                 print(str(self.max_generations) + " generations ended. Computing result ..")
-                print(X_evo)
+                # print("The Final Population is as follows : ")
+                # print(X_evo)
+
+                print("\n \n \n The Optimal solution for the given objective is :")
+                X = X_evo[0]
+                best_value = eval(self.F[0])
+                best_member_index = 0
+                for solution in range(1, self.population_size, 1):
+                    X = X_evo[solution]
+                    this_value = eval(self.F[0])
+                    if this_value<best_value:
+                        best_value = this_value
+                        best_member_index = solution
+
+                print("Optimal Value: " + str(best_value) + " \n Best Solution: " + str(X_evo[best_member_index]))
 
 
     def secure_expression_check(self):
@@ -87,16 +101,16 @@ class Optimizer:
         # return True
 
 
-# Un-comment the following code to test: 
+# Un-comment the following code to test:
 # def main():
 #     op = Optimizer()
 #     op.population_size = 10
-#     op.max_generations = 1000
+#     op.max_generations = 100
 #     op.num_params = 5
 #     op.num_objectives = 1
 #     op.F = ["X[0] + X[1] + X[2] + X[3] + X[4]"]
-#     op.X_lo = [-3, 3, -3, 3, -9]
-#     op.X_hi = [100, 80, 100, 120, 80]
+#     op.X_lo = [906, 0, 0, 0, 8]
+#     op.X_hi = [907, 80, 100, 120, 80]
 #
 #     op.solve()
 #
