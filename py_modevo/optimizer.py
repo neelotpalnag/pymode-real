@@ -42,39 +42,41 @@ class Optimizer:
         X_init = initialize(self.X_hi, self.X_lo, self.population_size)
 
         if self.secure_expression_check() is True:
-            if self.num_objectives >= 2:
-                # Proceed with multi-objective optimization only if num_objectives >=2
-                pass
-
-            else:
-                # Proceed with Single-Objective Optimization if um_objectives = 1
-                X_evo = X_init
-                for i in range(0, self.max_generations, 1):
+            # if self.num_objectives >= 2:
+            #     # Proceed with multi-objective optimization only if num_objectives >=2
+            #     pass
+            #
+            # else:
+            #     # Proceed with Single-Objective Optimization if um_objectives = 1
+            X_evo = X_init
+            for i in range(0, self.max_generations, 1):
+                for j in self.F:
                     # STEP 2: Mutation
                     X_mutated = mutate(X_evo, self.X_hi, self.X_lo, self.population_size)
 
                     # STEP 3: Crossover
-                    X_crossed = cross_binary(X_evo, X_mutated, self.crossover_prob, self.X_hi, self.X_lo, self.population_size)
+                    X_crossed = cross_binary(X_evo, X_mutated, self.crossover_prob, self.X_hi, self.X_lo,
+                                             self.population_size)
 
                     # STEP 4: Selection
-                    X_evo = selection(self.F, X_crossed, X_evo, self.population_size)
+                    X_evo = selection(self.F[j], X_crossed, X_evo, self.population_size)
 
-                print(str(self.max_generations) + " generations ended. Computing result ..")
-                # print("The Final Population is as follows : ")
-                # print(X_evo)
+            print(str(self.max_generations) + " generations ended. Computing result ..")
+            # print("The Final Population is as follows : ")
+            # print(X_evo)
 
-                print("\n \n \n The Optimal solution for the given objective is :")
-                X = X_evo[0]
-                best_value = eval(self.F[0])
-                best_member_index = 0
-                for solution in range(1, self.population_size, 1):
-                    X = X_evo[solution]
-                    this_value = eval(self.F[0])
-                    if this_value<best_value:
-                        best_value = this_value
-                        best_member_index = solution
+            print("\n \n \n The Optimal solution for the given objective is :")
+            X = X_evo[0]
+            best_value = eval(self.F[0])
+            best_member_index = 0
+            for solution in range(1, self.population_size, 1):
+                X = X_evo[solution]
+                this_value = eval(self.F[0])
+                if this_value<best_value:
+                    best_value = this_value
+                    best_member_index = solution
 
-                print("Optimal Value: " + str(best_value) + " \n Best Solution: " + str(X_evo[best_member_index]))
+            print("Optimal Value: " + str(best_value) + " \n Best Solution: " + str(X_evo[best_member_index]))
 
 
     def secure_expression_check(self):
@@ -90,8 +92,8 @@ class Optimizer:
         #         if j in i:
         #             print("Insecure Expression. Please use operators only from the following list:")
         #             print("acos, asin, atan, atan2, ceil, cos,\n"
-        #              +"cosh, degrees, e, exp, fabs, floor,\n"
-        #              +"fmod, frexp, hypot, ldexp, log, log10,\n"
+        #              + "cosh, degrees, e, exp, fabs, floor,\n"
+        #              + "fmod, frexp, hypot, ldexp, log, log10,\n"
         #              + "modf, pi, pow, radians, sin, sinh, sqrt,\n"
         #              + "tan, tanh\n")
         #             print("TERMINATING..")
