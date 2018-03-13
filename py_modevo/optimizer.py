@@ -59,13 +59,13 @@ class Optimizer:
                                              self.population_size)
 
                     # STEP 4: Selection
-                    X_evo = selection(self.F[j], X_crossed, X_evo, self.population_size)
+                    X_evo = selection(j, X_crossed, X_evo, self.population_size)
 
             print(str(self.max_generations) + " generations ended. Computing result ..")
             # print("The Final Population is as follows : ")
             # print(X_evo)
 
-            print("\n \n \n The Optimal solution for the given objective is :")
+            print("\n \n The Optimal solution for the given objective is :")
             X = X_evo[0]
             best_value = eval(self.F[0])
             best_member_index = 0
@@ -80,41 +80,31 @@ class Optimizer:
 
 
     def secure_expression_check(self):
+        safety_checklist = ["sudo", "su", "rm", "del", "dir", "dd", "mv", "git",
+                            "wget"]
+        for i in self.F:
+            for j in safety_checklist:
+                if j in i:
+                    print("Insecure Expression detected")
+                    print("TERMINATING")
+                    return False
+
+        print("Secure Expressions found. Proceeding .. ")
         return True
-        # list of safe methods
-        # safe_list = ['acos', 'asin', 'atan', 'atan2', 'ceil', 'cos',
-        #              'cosh', 'degrees', 'e', 'exp', 'fabs', 'floor',
-        #              'fmod', 'frexp', 'hypot', 'ldexp', 'log', 'log10',
-        #              'modf', 'pi', 'pow', 'radians', 'sin', 'sinh', 'sqrt',
-        #              'tan', 'tanh']
-        # for i in self.F:
-        #     for j in safe_list:
-        #         if j in i:
-        #             print("Insecure Expression. Please use operators only from the following list:")
-        #             print("acos, asin, atan, atan2, ceil, cos,\n"
-        #              + "cosh, degrees, e, exp, fabs, floor,\n"
-        #              + "fmod, frexp, hypot, ldexp, log, log10,\n"
-        #              + "modf, pi, pow, radians, sin, sinh, sqrt,\n"
-        #              + "tan, tanh\n")
-        #             print("TERMINATING..")
-        #             return False
-        #
-        # print("Secure Expressions found. Proceeding .. ")
-        # return True
 
 
 # Un-comment the following code to test:
-# def main():
-#     op = Optimizer()
-#     op.population_size = 10
-#     op.max_generations = 100
-#     op.num_params = 5
-#     op.num_objectives = 1
-#     op.F = ["X[0] + X[1] + X[2] + X[3] + X[4]"]
-#     op.X_lo = [906, 0, 0, 0, 8]
-#     op.X_hi = [907, 80, 100, 120, 80]
-#
-#     op.solve()
-#
-# if __name__ == '__main__':
-#     main()
+def main():
+    op = Optimizer()
+    op.population_size = 10
+    op.max_generations = 100
+    op.num_params = 5
+    op.num_objectives = 1
+    op.F = ["X[0] + X[1] + X[2] + X[3] + X[4]"]
+    op.X_lo = [906, 0, 0, 0, 8]
+    op.X_hi = [907, 80, 100, 120, 80]
+
+    op.solve()
+
+if __name__ == '__main__':
+    main()
