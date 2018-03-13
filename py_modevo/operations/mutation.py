@@ -37,7 +37,7 @@ def get_distinct_rn_int(cap):
         if rn2 == 0:
             rn2 = rn2 + 1
     rn3 = cap
-    while rn3 != rn1 & rn3 != rn2:
+    while rn3!=rn1 & rn3!=rn2:
         rn3 = math.ceil(random.uniform(0, 1) * cap)
         if rn3 == 0:
             rn3 = rn3 + 1
