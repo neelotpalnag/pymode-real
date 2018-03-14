@@ -18,12 +18,14 @@ class Individual:
         self.crowding_distance = 0
 
 
-def ranking(F, X_in, num_params, num_objectives, pop_size):
+def ranking(F, X_in):
 
     front = 1
     Fronts = dict(
         [(front, [])]
     )
+    num_objectives = len(F)
+    pop_size = len(X_in)
 
     individuals = []
     for i in range(0, pop_size, 1):
@@ -68,6 +70,8 @@ def ranking(F, X_in, num_params, num_objectives, pop_size):
 
         front  = front + 1
         Fronts[front].update(buf)
+
+        individuals = crowding_distance(Fronts, individuals, num_objectives)
 
         return [Fronts, individuals]
 
