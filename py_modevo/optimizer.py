@@ -15,6 +15,8 @@ from operations.initialization import initialize
 from operations.mutation import mutate
 from operations.crossover_binary import cross_binary
 from operations.selection import selection
+from operations.elitism import elitism
+
 
 # Specify the Objective Functions in a Matrix format
 # For objective function matrix F(x) = [F1(x), F2(x) ... Fk(x)], where x = [x1, x2,x3 ..., xn]
@@ -42,15 +44,34 @@ class Optimizer:
         X_init = initialize(self.X_hi, self.X_lo, self.population_size)
 
         if self.secure_expression_check() is True:
-            # if self.num_objectives >= 2:
-            #     # Proceed with multi-objective optimization only if num_objectives >=2
-            #     pass
-            #
-            # else:
-            #     # Proceed with Single-Objective Optimization if um_objectives = 1
-            X_evo = X_init
-            for i in range(0, self.max_generations, 1):
-                for j in self.F:
+            if self.num_objectives >= 2:
+                # Proceed with multi-objective optimization only if num_objectives >=2
+                X_parent = X_init
+
+                for i in range(0, self.max_generations, 1):
+                    # STEP 2: Mutation
+                    X_mutated = mutate(X_parent, self.X_hi, self.X_lo, self.population_size)
+
+                    # STEP 3: Crossover
+                    X_crossed = cross_binary(X_parent, X_mutated, self.crossover_prob, self.X_hi, self.X_lo,
+                                             self.population_size)
+
+                    # STEP 4: Selection
+                    X_sel = selection(self.F, X_crossed, X_parent, self.population_size)
+                    # Uncomment the following lines to output daughter population values at every generation
+                    # print("GENERATION : " + i)
+                    # print(X_evo)
+
+                    # STEP 5: Elitism
+                    X_elite = elitism(self.F, X_parent, X_sel)
+
+
+                pass
+
+            else:
+                # Proceed with Single-Objective Optimization if um_objectives = 1
+                X_evo = X_init
+                for i in range(0, self.max_generations, 1):
                     # STEP 2: Mutation
                     X_mutated = mutate(X_evo, self.X_hi, self.X_lo, self.population_size)
 
@@ -59,24 +80,26 @@ class Optimizer:
                                              self.population_size)
 
                     # STEP 4: Selection
-                    X_evo = selection(j, X_crossed, X_evo, self.population_size)
+                    X_evo = selection(self.F, X_crossed, X_evo, self.population_size)
+                    # Uncomment the following lines to output population values at every generation
+                    # print("GENERATION : " + i)
+                    # print(X_evo)
 
-            print(str(self.max_generations) + " generations ended. Computing result ..")
-            # print("The Final Population is as follows : ")
-            # print(X_evo)
+                print(str(self.max_generations) + " generations ended. Computing result ..")
 
-            print("\n \n The Optimal solution for the given objective is :")
-            X = X_evo[0]
-            best_value = eval(self.F[0])
-            best_member_index = 0
-            for solution in range(1, self.population_size, 1):
-                X = X_evo[solution]
-                this_value = eval(self.F[0])
-                if this_value<best_value:
-                    best_value = this_value
-                    best_member_index = solution
 
-            print("Optimal Value: " + str(best_value) + " \n Best Solution: " + str(X_evo[best_member_index]))
+                print("\n \n The Optimal solution for the given objective is :")
+                X = X_evo[0]
+                best_value = eval(self.F[0])
+                best_member_index = 0
+                for solution in range(1, self.population_size, 1):
+                    X = X_evo[solution]
+                    this_value = eval(self.F[0])
+                    if this_value<best_value:
+                        best_value = this_value
+                        best_member_index = solution
+
+                print("Optimal Value: " + str(best_value) + " \n Best Solution: " + str(X_evo[best_member_index]))
 
 
     def secure_expression_check(self):
