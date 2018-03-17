@@ -59,14 +59,16 @@ class Optimizer:
                     # STEP 4: Selection
                     X_sel = selection(self.F, X_crossed, X_parent, self.population_size)
                     # Uncomment the following lines to output daughter population values at every generation
-                    # print("GENERATION : " + i)
+                    print("GENERATION : " + str(i))
                     # print(X_evo)
 
                     # STEP 5: Elitism
                     X_elite = elitism(self.F, X_parent, X_sel)
 
+                    X_parent = X_elite[:self.population_size]
 
-                pass
+                print(str(self.max_generations) + " generations ended. Computing result ..")
+
 
             else:
                 # Proceed with Single-Objective Optimization if um_objectives = 1
@@ -119,11 +121,11 @@ class Optimizer:
 # Un-comment the following code to test:
 def main():
     op = Optimizer()
-    op.population_size = 10
-    op.max_generations = 100
+    op.population_size = 30
+    op.max_generations = 30
     op.num_params = 5
-    op.num_objectives = 1
-    op.F = ["X[0] + X[1] + X[2] + X[3] + X[4]"]
+    op.num_objectives = 2
+    op.F = ["X[0] + X[1] + X[2] + X[3] + X[4]", "X[0] + X[3]"]
     op.X_lo = [906, 0, 0, 0, 8]
     op.X_hi = [907, 80, 100, 120, 80]
 

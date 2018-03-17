@@ -6,6 +6,7 @@ def selection(objF, X_trial, X_target, pop_size):
             X = X_trial
             trial_F_val = eval(objF[j])
             X = X_target
+
             target_F_val = eval(objF[j])
             if trial_F_val < target_F_val:
                 trial_wins = 1
