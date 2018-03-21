@@ -1,7 +1,9 @@
 from .pareto_tools import *
+from .evaluate import evaluate
+
 
 # Perform
-def elitism(F, X_parent, X_daughter):
+def elitism(num_obj, X_parent, X_daughter):
 
     X_pool = X_parent + X_daughter
 
@@ -12,15 +14,15 @@ def elitism(F, X_parent, X_daughter):
 
     # F_evaluated is a 2D list, with elements as [Objective][Individual]
     # F_evaluated[i][j] implies the value of the (i)th objective for the (j)th individual
-    F_evaluated = [[0 for x in range(0, len(F), 1)] for y in range(2*pop_size)]
-    for f in range(0, len(F), 1):
+    F_evaluated = [[0 for x in range(0, num_obj, 1)] for y in range(2*pop_size)]
+    for f in range(0, num_obj, 1):
         for i in range(0, len(X_pool), 1):
-            X = X_pool[i]
-            F_evaluated[i][f] = eval(F[f])
+            F_evaluated[i][f] = evaluate(f, X_pool[i])
 
     [Fronts, Individuals] = ranking(F_evaluated, X_pool)
 
-    elite_population = [[0 for x in range(0, num_params, 1)] for y in range(pop_size)]
+    # elite_population = [[0 for x in range(0, num_params, 1)] for y in range(pop_size)]
+    elite_population = []
     counter = pop_size
     for front in Fronts:
         front_size = len(Fronts[front])
@@ -41,9 +43,9 @@ def elitism(F, X_parent, X_daughter):
             for i in range(0, counter, 1):
                 elite_population.append(Individuals[buf[i]].X)
 
-    return elite_population[:pop_size]
+    return [elite_population[:pop_size], Fronts]
 
- 
+
 
 
 
