@@ -38,7 +38,6 @@ def ranking(F, X_in):
         individuals[i].sp = []
         individuals[i].np = 0
 
-
     for i in range(0, pop_size, 1):
         for j in range(0, pop_size, 1):
             less_d = 0
@@ -66,7 +65,6 @@ def ranking(F, X_in):
                 [(front,front_mem)]
             )
             Fronts.update(dat)
-
 
     while Fronts[front]:
         buff = []
