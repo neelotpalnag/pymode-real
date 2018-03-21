@@ -16,6 +16,8 @@ from operations.mutation import mutate
 from operations.crossover_binary import cross_binary
 from operations.selection import selection
 from operations.elitism import elitism
+from operations.evaluate import evaluate
+from operations.pareto_tools import ranking
 
 
 # Specify the Objective Functions in a Matrix format
@@ -31,10 +33,13 @@ class Optimizer:
         self.max_generations = 100  # Default = 100
         self.num_objectives = 1     # Must be set by user
         self.num_params = 2         # Must be set by user
+        self.X = []
 
-        self.F = [" ",]              # List of Objective Functions   #   Must be set by user
-        self.X_hi = [0, 0]          # List of Upper bounds of Xi's  #   Must be set by user
-        self.X_lo = [0, 0]          # List of Lower bounds of Xi's  #   Must be set by user
+        # List of Objective Functions : Set in ./evaluate
+
+
+        self.X_lo = [0, -5, -5, -5, -5, -5, -5, -5, -5, -5]          # List of Upper bounds of Xi's  #   Must be set by user
+        self.X_hi = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]          # List of Lower bounds of Xi's  #   Must be set by user
 
         self.crossover_prob = 0.3   # Default  = 0.3 ; Increase to 0.9 for quick convergence, or else to 0.1
 
@@ -47,28 +52,37 @@ class Optimizer:
             if self.num_objectives >= 2:
                 # Proceed with multi-objective optimization only if num_objectives >=2
                 X_parent = X_init
+                # print(X_init)
 
                 for i in range(0, self.max_generations, 1):
+                    print("GENERATION : " + str(i))
+
                     # STEP 2: Mutation
                     X_mutated = mutate(X_parent, self.X_hi, self.X_lo, self.population_size)
+                    # print(X_mutated)
 
                     # STEP 3: Crossover
                     X_crossed = cross_binary(X_parent, X_mutated, self.crossover_prob, self.X_hi, self.X_lo,
                                              self.population_size)
+                    # print(X_crossed)
 
                     # STEP 4: Selection
-                    X_sel = selection(self.F, X_crossed, X_parent, self.population_size)
+                    X_sel = selection(self.num_objectives, X_crossed, X_parent, self.population_size)
                     # Uncomment the following lines to output daughter population values at every generation
-                    print("GENERATION : " + str(i))
-                    # print(X_evo)
+                    # print(X_sel)
 
                     # STEP 5: Elitism
-                    X_elite = elitism(self.F, X_parent, X_sel)
+                    X_elite = elitism(self.num_objectives, X_parent, X_sel)
+                    # print("ELITE: " + str(X_elite))
 
-                    X_parent = X_elite[:self.population_size]
+                    X_parent = X_elite[0][:self.population_size]
 
                 print(str(self.max_generations) + " generations ended. Computing result ..")
+                print(X_parent)
 
+                # Generate file for pareto generation:
+                Pareto_front = X_elite[1]
+                print("Pareto front: " + str(Pareto_front))
 
             else:
                 # Proceed with Single-Objective Optimization if um_objectives = 1
@@ -82,7 +96,7 @@ class Optimizer:
                                              self.population_size)
 
                     # STEP 4: Selection
-                    X_evo = selection(self.F, X_crossed, X_evo, self.population_size)
+                    X_evo = selection(self.num_objectives, X_crossed, X_evo, self.population_size)
                     # Uncomment the following lines to output population values at every generation
                     # print("GENERATION : " + i)
                     # print(X_evo)
@@ -91,12 +105,11 @@ class Optimizer:
 
 
                 print("\n \n The Optimal solution for the given objective is :")
-                X = X_evo[0]
-                best_value = eval(self.F[0])
+                best_value = evaluate(X_evo[0])
                 best_member_index = 0
                 for solution in range(1, self.population_size, 1):
                     X = X_evo[solution]
-                    this_value = eval(self.F[0])
+                    this_value = evaluate(X_evo[0])
                     if this_value<best_value:
                         best_value = this_value
                         best_member_index = solution
@@ -105,29 +118,28 @@ class Optimizer:
 
 
     def secure_expression_check(self):
-        safety_checklist = ["sudo", "su", "rm", "del", "dir", "dd", "mv", "git",
-                            "wget"]
-        for i in self.F:
-            for j in safety_checklist:
-                if j in i:
-                    print("Insecure Expression detected")
-                    print("TERMINATING")
-                    return False
-
-        print("Secure Expressions found. Proceeding .. ")
+        # safety_checklist = ["sudo", "su", "rm", "del", "dir", "dd", "mv", "git",
+        #                     "wget"]
+        # for i in range(0, self.num_objectives, 1):
+        #     for j in safety_checklist:
+        #         if j in i:
+        #             print("Insecure Expression detected")
+        #             print("TERMINATING")
+        #             return False
+        #
+        # print("Secure Expressions found. Proceeding .. ")
         return True
 
 
 # Un-comment the following code to test:
 def main():
     op = Optimizer()
-    op.population_size = 30
-    op.max_generations = 30
-    op.num_params = 5
+    op.population_size = 50
+    op.max_generations = 500
+    op.num_params = 10
     op.num_objectives = 2
-    op.F = ["X[0] + X[1] + X[2] + X[3] + X[4]", "X[0] + X[3]"]
-    op.X_lo = [906, 0, 0, 0, 8]
-    op.X_hi = [907, 80, 100, 120, 80]
+
+    # Define the objectives in the "Optimizer" class
 
     op.solve()
 
