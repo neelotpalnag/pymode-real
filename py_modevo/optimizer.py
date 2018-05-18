@@ -35,24 +35,13 @@ class Optimizer:
         self.num_params = 2         # Must be set by user
         self.X = []
 
-        self.DE_MODE = ['R', '1', 'BIN']       # Set to Rand/1/Bin by default
-
         # List of Objective Functions : Set in ./evaluate
 
 
-        self.X_lo = []          # List of Upper bounds of Xi's  #   Must be set by user in MAIN()
-        self.X_hi = []          # List of Lower bounds of Xi's  #   Must be set by user in MAIN()
+        self.X_lo = [0, -5, -5, -5, -5, -5, -5, -5, -5, -5]          # List of Upper bounds of Xi's  #   Must be set by user
+        self.X_hi = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]          # List of Lower bounds of Xi's  #   Must be set by user
 
-        self.crossover_prob = 0.3  # Default  = 0.3 ; Increase to 0.9 for quick convergence, or else to 0.1
-
-
-        if self.DE_MODE[1] == '1':
-            self.num_difference_vectors = 1
-        elif self.DE_MODE[1] == '2':
-            self.num_difference_vectors = 2
-        else:
-            exit(0)
-
+        self.crossover_prob = 0.3   # Default  = 0.3 ; Increase to 0.9 for quick convergence, or else to 0.1
 
 
     def solve(self):
@@ -69,7 +58,7 @@ class Optimizer:
                     print("GENERATION : " + str(i))
 
                     # STEP 2: Mutation
-                    X_mutated = mutate(X_parent, self.X_hi, self.X_lo, self.population_size, seed_gen=i, num_difference_vectors=self.num_difference_vectors)
+                    X_mutated = mutate(X_parent, self.X_hi, self.X_lo, self.population_size, seed_gen=i)
                     # print(X_mutated)
 
                     # STEP 3: Crossover
@@ -131,7 +120,7 @@ class Optimizer:
         return True
 
 
-
+# Un-comment the following code to test:
 def main():
     op = Optimizer()
     op.population_size = 100
@@ -141,11 +130,6 @@ def main():
 
     # Define the objectives in the "Optimizer" class
 
-    op.X_hi = [0, -5, -5, -5, -5, -5, -5, -5, -5, -5]          # List of Upper bounds of Xi's  #   Must be set by user
-    op.X_lo = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]                   # List of Lower bounds of Xi's  #   Must be set by user
-
-
-    op.DE_MODE = ['R', '1', 'bin']
     op.solve()
 
 if __name__ == '__main__':
