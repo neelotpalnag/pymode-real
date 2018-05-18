@@ -15,7 +15,8 @@ from math import *
 import math
 from matplotlib import pyplot as plotter
 
-
+global CTR
+CTR = 0
 # Specify the Objective Functions in a Matrix format
 # For objective function matrix F(x) = [F1(x), F2(x) ... Fk(x)], where x = [x1, x2,x3 ..., xn]
 # Specify the upper & lower limits of parameter-space i.e. X_hi[] & X_lo[]
@@ -42,7 +43,7 @@ class Optimizer:
 
     def solve(self):
         # STEP 1: Generate the INITIAL POPULATION
-        X_init = initialize(self.X_hi, self.X_lo, self.population_size)
+        X_init = initialize(self.X_hi, self.X_lo, self.population_size, self.num_objectives)
 
         if True:
             if self.num_objectives >= 2:
@@ -54,21 +55,21 @@ class Optimizer:
                     print("GENERATION : " + str(i))
 
                     # STEP 2: Mutation
-                    X_mutated = mutate(X_parent, self.X_hi, self.X_lo, self.population_size, seed_gen=i)
+                    X_mutated = mutate(X_parent, self.X_hi, self.X_lo, self.num_objectives, self.population_size, seed_gen=i)
                     # print(X_mutated)
 
                     # STEP 3: Crossover
                     X_crossed = cross_binomial(X_parent, X_mutated, self.crossover_prob, self.X_hi, self.X_lo,
-                                             self.population_size)
+                                             self.population_size, self.num_objectives)
                     # print(X_crossed)
 
                     # STEP 4: Selection
-                    X_sel = selection(self.num_objectives, X_crossed, X_parent, self.population_size)
+                    X_sel = selection(self.num_objectives, X_crossed, X_parent, self.population_size, self.num_params)
                     # Uncomment the following lines to output daughter population values at every generation
                     # print(X_sel)
 
                     # STEP 5: Elitism
-                    ELITISM_RES = elitism(self.num_objectives, X_parent, X_sel)
+                    ELITISM_RES = elitism(self.num_objectives, X_parent, X_sel, self.num_params)
                     # print("ELITE: " + str(X_elite))
 
                     X_parent = ELITISM_RES[0][:self.population_size]
@@ -104,19 +105,22 @@ class Optimizer:
 import random
 
 
-def initialize(X_hi, X_lo, pop_size):
-    X_init = [[0 for x in range(len(X_hi))] for y in range(pop_size)]
+def initialize(X_hi, X_lo, pop_size, num_objectives):
+    X_init = [[0 for x in range(len(X_hi)+num_objectives)] for y in range(pop_size)]
     for i in range(0, pop_size, 1):
         for j in range(0, len(X_hi), 1):
             rn = random.uniform(0, 1)
             X_init[i][j] = round(X_lo[j] + rn * (X_hi[j] - X_lo[j]), 4)
+
+        for k in range(0, num_objectives, 1):
+            X_init[i][len(X_hi)+k] = evaluate(k, X_init[i][:len(X_hi)])
 
     return X_init
 
 
 ##########################################################################################################################
 
-def cross_binomial(X, V, cr, X_hi, X_lo, pop_size):
+def cross_binomial(X, V, cr, X_hi, X_lo, pop_size, num_objectives):
     # The method "cross_binary" requires the following parameters:
     # X : The population from the previous generation
     # V : The mutated population
@@ -128,9 +132,10 @@ def cross_binomial(X, V, cr, X_hi, X_lo, pop_size):
     random.seed(6543)
 
     num_vars = len(X_hi)
-    X_cross = [[0 for x in range(len(X_hi))] for y in range(pop_size)]
+    X_cross = [[0 for x in range(len(X_hi)+num_objectives)] for y in range(pop_size)]
 
     for i in range(0, pop_size, 1):
+        random.seed(i)
         rand = math.ceil(random.random() * num_vars)
         j_rand = rand if rand!= 0 else rand+1
         for j in range(0, num_vars, 1):
@@ -139,17 +144,19 @@ def cross_binomial(X, V, cr, X_hi, X_lo, pop_size):
             else:
                 X_cross[i][j] = X[i][j]
 
+        for k in range(0, num_objectives, 1):
+            X_cross[i][num_vars+k] = 0
+
     return X_cross
 
 
 ##########################################################################################################################
 
 # Perform
-def elitism(num_obj, X_parent, X_daughter):
+def elitism(num_obj, X_parent, X_daughter, num_params):
 
     X_pool = X_parent + X_daughter
 
-    num_params = len(X_parent[0])
     pop_size = len(X_parent)
 
     # STEP 1 : Create fronts of all 2 x pop_size individuals in the combined pool of parent and daughter
@@ -159,7 +166,7 @@ def elitism(num_obj, X_parent, X_daughter):
     F_evaluated = [[0 for x in range(0, num_obj, 1)] for y in range(2*pop_size)]
     for f in range(0, num_obj, 1):
         for i in range(0, len(X_pool), 1):
-            F_evaluated[i][f] = evaluate(f, X_pool[i])
+            F_evaluated[i][f] = X_pool[i][num_params + f]
 
     [Fronts, Individuals] = ranking(F_evaluated, X_pool)
 
@@ -191,28 +198,31 @@ def elitism(num_obj, X_parent, X_daughter):
 ##########################################################################################################################
 
 
-def mutate(X, X_hi, X_lo, pop_size, seed_gen):
+def mutate(X, X_hi, X_lo, num_objectives, pop_size, seed_gen):
     # The method "mutate" requires the following parameters:
     # X : The population from the previous generation
     # X_hi : Max. Values of Xi
     # X_lo : Min. Values of Xi
     # pop_size : Population Size
 
-    num_vars = len(X_hi)
-    X_mut = [[0 for x in range(num_vars)] for y in range(pop_size)]
+    num_params = len(X_hi)
+    X_mut = [[0 for x in range(num_params + num_objectives)] for y in range(pop_size)]
     random.seed(seed_gen)
     F = 2 * random.uniform(0, 1)
 
     for i in range(0, pop_size, 1):
-        for j in range(0, num_vars, 1):
-            rn_int = random.sample(range(0, num_vars), 3)
-            val = X[i][rn_int[0]] + F * (X[i][rn_int[1]] - X[i][rn_int[2]])
+        rn_int = random.sample(range(0, pop_size), 3)
+        for j in range(0, num_params, 1):
+            val = X[rn_int[0]][j] + F * (X[rn_int[1]][j] - X[rn_int[2]][j])
             if val > X_hi[j]:
                 X_mut[i][j] = X_hi[j]
             elif val < X_lo[j]:
                 X_mut[i][j] = X_lo[j]
             else:
                 X_mut[i][j] = val
+
+        for k in range(0, num_objectives, 1):
+            X_mut[i][num_params+k] = 0
 
     return X_mut
 
@@ -347,21 +357,25 @@ def crowding_distance(fronts, individuals, num_objectives):
 
 ##########################################################################################################################
 
-def selection(num_obj, X_trial, X_target, pop_size):
-    X_sel = [[0 for x in range(len(X_trial[0]))] for y in range(pop_size)]
+def selection(num_obj, X_trial, X_target, pop_size, num_params):
+
+    X_sel = [[0 for x in range(num_params)] for y in range(pop_size)]
     for i in range(0, pop_size, 1):
         trial_wins = 0
+
+        trial_F_val = []
+        target_F_val = []
         for j in range(0, num_obj,1):
-            trial_F_val = evaluate(j, X_trial[i])
-            target_F_val = evaluate(j, X_target[i])
-            if trial_F_val < target_F_val:
+            trial_F_val.append(evaluate(j, X_trial[i]))
+            target_F_val.append(X_target[i][num_params + j])
+            if trial_F_val[j] < target_F_val[j]:
                 trial_wins = 1
 
         if  trial_wins == 1:
-            X_sel[i] = X_trial[i]
+            X_sel[i] = X_trial[i][:num_params] + trial_F_val
 
         else:
-            X_sel[i] = X_target[i]
+            X_sel[i] = X_target[i][:num_params] + target_F_val
 
     return X_sel
 ##########################################################################################################################
@@ -373,20 +387,36 @@ def evaluate(obj_index, x_input):
 
 
 
-    # E = [[10, 1/10], [11, 1/12], [12, 1/15], [13, 1/20], [14, 1/25], [15, 1/35], [16, 1/40], [17, 1/42], [18, 1/43], [19, 1/48], [20, 1/52],
-    #      [21, 1/56], [22, 1/54], [23, 1/52], [24, 1/53], [25, 1/58], [26, 1/59], [27, 1/58], [28, 1/54], [29, 1/56], [30, 1/54], [31, 1/52],
-    #      [32, 1/54], [33, 1/55], [34, 1/56], [35, 1/58], [36, 1/59], [37, 1/60], [38, 1/62], [39, 1/63], [40, 1/64], [41, 1/64], [42, 1/62],
-    #      [43, 1/63], [44, 1/67], [45, 1/67], [46, 1/68], [47, 1/63], [48, 1/62], [49, 1/61], [50, 1/60], [51, 1/56], [52, 1/54]]
+    E = [[10, 1/10], [11, 1/12], [12, 1/15], [13, 1/20], [14, 1/25], [15, 1/35], [16, 1/40], [17, 1/42], [18, 1/43], [19, 1/48], [20, 1/52],
+         [21, 1/56], [22, 1/54], [23, 1/52], [24, 1/53], [25, 1/58], [26, 1/59], [27, 1/58], [28, 1/54], [29, 1/56], [30, 1/54], [31, 1/52],
+         [32, 1/54], [33, 1/55], [34, 1/56], [35, 1/58], [36, 1/59], [37, 1/60], [38, 1/62], [39, 1/63], [40, 1/64], [41, 1/64], [42, 1/62],
+         [43, 1/63], [44, 1/67], [45, 1/67], [46, 1/68], [47, 1/63], [48, 1/62], [49, 1/61], [50, 1/60], [51, 1/56], [52, 1/54]]
 
-    # E_dict = {}
-    # for i in range(0, len(E), 1):
-    #     E_dict[E[i][0]] = E[i][1]
+    E_dict = {}
+    for i in range(0, len(E), 1):
+        E_dict[E[i][0]] = E[i][1]
 
     F[0] = round(X[0])
-    # F[1] is the Accuracy Value
+    F[1] = E_dict[round(X[0])]
+    #
+    # ### TODO: REPLACE WITH F[1] = GET_ACCURACY
+    # F[1] = (round(X[0]))
 
-    ### TODO: REPLACE WITH F[1] = GET_ACCURACY
-    F[1] = (round(X[0]))
+
+    #
+    # if obj_index==0:
+    #     F[0] = X[0]
+    #     return F[0]
+    #
+    # elif obj_index==1:
+    #     global CTR
+    #     CTR = CTR + 1
+    #     print(CTR)
+    #     F[1] = 91
+    #     for i in range(1, 10, 1):
+    #         F[1] = F[1] + pow(X[i], 2) - (10 * cos(4 * pi * X[i]))
+    #     F[1] = F[1] * (1 - sqrt(X[0] / F[1]))
+    #     return F[1]
 
 
     return F[obj_index]
@@ -395,13 +425,18 @@ def evaluate(obj_index, x_input):
 
 # Un-comment the following code to test:
 def main():
+
+
     op = Optimizer()
-    op.population_size = 50
-    op.max_generations = 400
-    op.num_params = 10
+    op.population_size = 100
+    op.max_generations = 2
+    op.num_params = 1
     op.num_objectives = 2
 
     # Define the objectives in the "Optimizer" class
+
+    op.X_hi = [52]
+    op.X_lo = [10]
 
     op.solve()
 
