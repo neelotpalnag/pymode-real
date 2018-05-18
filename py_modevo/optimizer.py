@@ -84,22 +84,6 @@ class Optimizer:
                 Pareto_front = X_elite[1]
                 print("Pareto front: " + str(Pareto_front))
 
-            else:
-                # Proceed with Single-Objective Optimization if um_objectives = 1
-                X_evo = X_init
-                for i in range(0, self.max_generations, 1):
-                    # STEP 2: Mutation
-                    X_mutated = mutate(X_evo, self.X_hi, self.X_lo, self.population_size)
-
-                    # STEP 3: Crossover
-                    X_crossed = cross_binary(X_evo, X_mutated, self.crossover_prob, self.X_hi, self.X_lo,
-                                             self.population_size)
-
-                    # STEP 4: Selection
-                    X_evo = selection(self.num_objectives, X_crossed, X_evo, self.population_size)
-                    # Uncomment the following lines to output population values at every generation
-                    # print("GENERATION : " + i)
-                    # print(X_evo)
 
                 print(str(self.max_generations) + " generations ended. Computing result ..")
 
@@ -117,6 +101,7 @@ class Optimizer:
                 print("Optimal Value: " + str(best_value) + " \n Best Solution: " + str(X_evo[best_member_index]))
 
 
+    # TODO: Eliminate or Fix
     def secure_expression_check(self):
         # safety_checklist = ["sudo", "su", "rm", "del", "dir", "dd", "mv", "git",
         #                     "wget"]
