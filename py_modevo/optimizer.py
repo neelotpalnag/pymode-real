@@ -112,7 +112,7 @@ class Optimizer:
                 res.close()
 
                 # Print the Plot
-                plotter.scatter(AXIS_Y, AXIS_X)
+                plotter.plot(AXIS_Y, AXIS_X)
                 plotter.show()
 
 
