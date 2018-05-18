@@ -51,10 +51,10 @@ def ranking(F, X_in):
                 else:
                     more_d = more_d + 1
 
-            if less_d==0 & equal_d != num_objectives:
+            if (less_d==0) & (equal_d != num_objectives):
                 individuals[i].sp.append(j)
 
-            elif more_d==0 & equal_d != num_objectives:
+            elif (more_d==0) & (equal_d != num_objectives):
                 individuals[i].np = individuals[i].np + 1
 
         if individuals[i].np == 0:
