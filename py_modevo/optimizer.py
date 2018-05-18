@@ -11,15 +11,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from operations.initialization import initialize
-from operations.mutation import mutate
-from operations.crossover_binary import cross_binary
-from operations.selection import selection
-from operations.elitism import elitism
-from operations.evaluate import evaluate
-from operations.pareto_tools import ranking
 
 import matplotlib.pyplot as plotter
+import math
 
 
 # Specify the Objective Functions in a Matrix format
@@ -40,8 +34,10 @@ class Optimizer:
         # List of Objective Functions : Set in ./evaluate
 
 
-        self.X_lo = [10]        # List of Upper bounds of Xi's  #   Must be set by user
-        self.X_hi = [52]          # List of Lower bounds of Xi's  #   Must be set by user
+        # self.X_lo = [10]        # List of Upper bounds of Xi's  #   Must be set by user
+        # self.X_hi = [52]          # List of Lower bounds of Xi's  #   Must be set by user
+        self.X_lo = [0, -5, -5, -5, -5, -5, -5, -5, -5, -5]  # List of Upper bounds of Xi's  #   Must be set by user
+        self.X_hi = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  # List of Lower bounds of Xi's  #   Must be set by user
 
         self.crossover_prob = 0.3   # Default  = 0.3 ; Increase to 0.9 for quick convergence, or else to 0.1
 
@@ -50,136 +46,376 @@ class Optimizer:
         # STEP 1: Generate the INITIAL POPULATION
         X_init = initialize(self.X_hi, self.X_lo, self.population_size)
 
-        if self.secure_expression_check() is True:
+        if True:
             if self.num_objectives >= 2:
                 # Proceed with multi-objective optimization only if num_objectives >=2
                 X_parent = X_init
                 # print(X_init)
 
-                E = [[10, 10], [11, 12], [12, 15], [13, 20], [14, 25], [15, 35], [16, 40], [17, 42], [18, 43], [19, 48],
-                     [20, 52],
-                     [21, 56], [25, 58], [26, 59], [36, 59], [37, 60], [38, 62], [39, 63], [40, 64], [41, 64], [44, 67],
-                     [45, 67]]
+                # E = [[10, 10], [11, 12], [12, 15], [13, 20], [14, 25], [15, 35], [16, 40], [17, 42], [18, 43], [19, 48],
+                #      [20, 52],
+                #      [21, 56], [25, 58], [26, 59], [36, 59], [37, 60], [38, 62], [39, 63], [40, 64], [41, 64], [44, 67],
+                #      [45, 67]]
 
-                # for i in range(0, self.max_generations, 1):
-                #     print("GENERATION : " + str(i))
-                #
-                #     # STEP 2: Mutation
-                #     X_mutated = mutate(X_parent, self.X_hi, self.X_lo, self.population_size)
-                #     # print(X_mutated)
-                #
-                #     # STEP 3: Crossover
-                #     X_crossed = cross_binary(X_parent, X_mutated, self.crossover_prob, self.X_hi, self.X_lo,
-                #                              self.population_size)
-                #     # print(X_crossed)
-                #
-                #     # STEP 4: Selection
-                #     X_sel = selection(self.num_objectives, X_crossed, X_parent, self.population_size)
-                #     # Uncomment the following lines to output daughter population values at every generation
-                #     # print(X_sel)
-                #
-                #     # STEP 5: Elitism
-                #     X_elite = elitism(self.num_objectives, X_parent, X_sel)
-                #     # print("ELITE: " + str(X_elite))
-                #
-                #     X_parent = X_elite[0][:self.population_size]
-                #
-                # print(str(self.max_generations) + " generations ended. Computing result ..")
-                # print(X_parent)
-                #
-                # # Generate file for pareto generation:
-                # Pareto_front = X_elite[1]
-                # print("Pareto front: " + str(Pareto_front))
-
-                # # Generate the Pareto plot for the two objectives :
-                # AXIS_X = [0 for t in range(0, len(Pareto_front[1]), 1)]
-                # AXIS_Y = [0 for t in range(0, len(Pareto_front[1]), 1)]
-                # res = open("zdt4.txt", 'w')
-
-                # for i in range(0, len(Pareto_front[1]), 1):
-                #     AXIS_X[i] = (evaluate(0, X_elite[0][Pareto_front[1][i]]))
-                #     AXIS_Y[i] = (evaluate(1, X_elite[0][Pareto_front[1][i]]))
-                #     res.write(str(AXIS_X[i]) + "," + str(AXIS_Y[i]) + "\n")
-                #
-                # # Print the Plot
-                # plotter.plot(AXIS_Y, AXIS_X)
-                # plotter.show()
-                # res.close()
-
-
-                RES = elitism(self.num_objectives, [[10], [11], [12], [13], [14], [15], [16], [17] ],
-                              [[21], [25], [26], [27], [28], [29], [30], [31]] )
-
-                print(RES[0])
-                print(RES[1])
-
-
-                AXIS_X = []
-                AXIS_Y = []
-
-                for i in range(0, len(E), 1):
-                    AXIS_X.append(E[i][0])
-                    AXIS_Y.append(E[i][1])
-
-
-                    # Print the Plot
-                plotter.plot(AXIS_Y, AXIS_X)
-                # plotter.show()
-
-
-            else:
-                # Proceed with Single-Objective Optimization if um_objectives = 1
-                X_evo = X_init
                 for i in range(0, self.max_generations, 1):
+                    print("GENERATION : " + str(i))
+
                     # STEP 2: Mutation
-                    X_mutated = mutate(X_evo, self.X_hi, self.X_lo, self.population_size)
+                    X_mutated = mutate(X_parent, self.X_hi, self.X_lo, self.population_size)
+                    # print(X_mutated)
 
                     # STEP 3: Crossover
-                    X_crossed = cross_binary(X_evo, X_mutated, self.crossover_prob, self.X_hi, self.X_lo,
+                    X_crossed = cross_binomial(X_parent, X_mutated, self.crossover_prob, self.X_hi, self.X_lo,
                                              self.population_size)
+                    # print(X_crossed)
 
                     # STEP 4: Selection
-                    X_evo = selection(self.num_objectives, X_crossed, X_evo, self.population_size)
-                    # Uncomment the following lines to output population values at every generation
-                    # print("GENERATION : " + i)
-                    # print(X_evo)
+                    X_sel = selection(self.num_objectives, X_crossed, X_parent, self.population_size)
+                    # Uncomment the following lines to output daughter population values at every generation
+                    # print(X_sel)
+
+                    # STEP 5: Elitism
+                    X_elite = elitism(self.num_objectives, X_parent, X_sel)
+                    # print("ELITE: " + str(X_elite))
+
+                    X_parent = X_elite[0][:self.population_size]
 
                 print(str(self.max_generations) + " generations ended. Computing result ..")
+                print(X_parent)
+
+                # Generate file for pareto generation:
+                Pareto_front = X_elite[1]
+                print("Pareto front: " + str(Pareto_front))
+
+                # Generate the Pareto plot for the two objectives :
+                AXIS_X = [0 for t in range(0, len(Pareto_front[1]), 1)]
+                AXIS_Y = [0 for t in range(0, len(Pareto_front[1]), 1)]
+                res = open("zdt4.txt", 'w')
+
+                for i in range(0, len(Pareto_front[1]), 1):
+                    AXIS_X[i] = (evaluate(0, X_elite[0][Pareto_front[1][i]]))
+                    AXIS_Y[i] = (evaluate(1, X_elite[0][Pareto_front[1][i]]))
+                    res.write(str(AXIS_X[i]) + "," + str(AXIS_Y[i]) + "\n")
+
+                res.close()
+
+                # Print the Plot
+                plotter.plot(AXIS_Y, AXIS_X)
+                plotter.show()
+
+##########################################################################################################################
+import random
 
 
-                print("\n \n The Optimal solution for the given objective is :")
-                best_value = evaluate(X_evo[0])
-                best_member_index = 0
-                for solution in range(1, self.population_size, 1):
-                    X = X_evo[solution]
-                    this_value = evaluate(X_evo[0])
-                    if this_value<best_value:
-                        best_value = this_value
-                        best_member_index = solution
+def initialize(X_hi, X_lo, pop_size):
+    X_init = [[0 for x in range(len(X_hi))] for y in range(pop_size)]
+    for i in range(0, pop_size, 1):
+        for j in range(0, len(X_hi), 1):
+            rn = random.uniform(0, 1)
+            X_init[i][j] = round(X_lo[j] + rn * (X_hi[j] - X_lo[j]), 4)
 
-                print("Optimal Value: " + str(best_value) + " \n Best Solution: " + str(X_evo[best_member_index]))
+    return X_init
 
 
-    def secure_expression_check(self):
-        # safety_checklist = ["sudo", "su", "rm", "del", "dir", "dd", "mv", "git",
-        #                     "wget"]
-        # for i in range(0, self.num_objectives, 1):
-        #     for j in safety_checklist:
-        #         if j in i:
-        #             print("Insecure Expression detected")
-        #             print("TERMINATING")
-        #             return False
-        #
-        # print("Secure Expressions found. Proceeding .. ")
-        return True
+##########################################################################################################################
 
+def cross_binomial(X, V, cr, X_hi, X_lo, pop_size):
+    # The method "cross_binary" requires the following parameters:
+    # X : The population from the previous generation
+    # V : The mutated population
+    # cr : The Crossover Probability, usually around 0.5
+    # X_hi : Max. Values of Xi
+    # X_lo : Min. Values of Xi
+    # pop_size : Population Size
+
+    random.seed(6543)
+
+    num_vars = len(X_hi)
+    X_cross = [[0 for x in range(len(X_hi))] for y in range(pop_size)]
+
+    for i in range(0, pop_size, 1):
+        rand = math.ceil(random.random() * num_vars)
+        j_rand = rand if rand!= 0 else rand+1
+        for j in range(0, num_vars, 1):
+            if cr > random.random() or j == j_rand:
+                X_cross[i][j] = V[i][j]
+            else:
+                X_cross[i][j] = X[i][j]
+
+    return X_cross
+
+
+##########################################################################################################################
+
+# Perform
+def elitism(num_obj, X_parent, X_daughter):
+
+    X_pool = X_parent + X_daughter
+
+    num_params = len(X_parent[0])
+    pop_size = len(X_parent)
+
+    # STEP 1 : Create fronts of all 2 x pop_size individuals in the combined pool of parent and daughter
+
+    # F_evaluated is a 2D list, with elements as [Objective][Individual]
+    # F_evaluated[i][j] implies the value of the (i)th objective for the (j)th individual
+    F_evaluated = [[0 for x in range(0, num_obj, 1)] for y in range(2*pop_size)]
+    for f in range(0, num_obj, 1):
+        for i in range(0, len(X_pool), 1):
+            F_evaluated[i][f] = evaluate(f, X_pool[i])
+
+    [Fronts, Individuals] = ranking(F_evaluated, X_pool)
+
+
+    # elite_population = [[0 for x in range(0, num_params, 1)] for y in range(pop_size)]
+    elite_population = []
+    counter = 2*pop_size
+    for front in Fronts:
+        front_size = len(Fronts[front])
+        if front_size<=counter:
+            counter = counter - front_size
+            for i in Fronts[front]:
+                elite_population.append(Individuals[i].X)
+
+        else:
+            # Sort the individuals of the current front on the basis of crowding distance
+            # and select the allowed number of individuals with higher crowding distances
+            sorter_dict = {}
+            front_unsorted = Fronts[front]
+            for i in front_unsorted:
+                sorter_dict[i] = Individuals[i].crowding_distance
+
+            buf = sorted(sorter_dict, key=sorter_dict.__getitem__, reverse=True)
+            for i in range(0, counter, 1):
+                elite_population.append(Individuals[buf[i]].X)
+
+    return [elite_population, Fronts]
+
+##########################################################################################################################
+
+
+def mutate(X, X_hi, X_lo, pop_size):
+    # The method "mutate" requires the following parameters:
+    # X : The population from the previous generation
+    # X_hi : Max. Values of Xi
+    # X_lo : Min. Values of Xi
+    # pop_size : Population Size
+
+    F = random.uniform(0, 1)
+    num_vars = len(X_hi)
+    X_mut = [[0 for x in range(num_vars)] for y in range(pop_size)]
+
+    for i in range(0, pop_size, 1):
+        for j in range(0, num_vars, 1):
+            rn_int = get_distinct_rn_int(num_vars)
+            val = X[i][rn_int[0]] + F * (X[i][rn_int[1]] - X[i][rn_int[2]])
+            if val > X_hi[j]:
+                X_mut[i][j] = X_hi[j]
+            elif val < X_lo[j]:
+                X_mut[i][j] = X_lo[j]
+            else:
+                X_mut[i][j] = val
+
+    return X_mut
+
+
+def get_distinct_rn_int(cap):
+    rn1 = math.ceil(random.uniform(0, 1) * cap)
+    if rn1 == 0:
+        rn1 = rn1 + 1
+    rn2 = cap
+    while rn2 != rn1:
+        rn2 = math.ceil(random.uniform(0, 1) * cap)
+        if rn2 == 0:
+            rn2 = rn2 + 1
+    rn3 = cap
+    while rn3!=rn1 & rn3!=rn2:
+        rn3 = math.ceil(random.uniform(0, 1) * cap)
+        if rn3 == 0:
+            rn3 = rn3 + 1
+
+    return [rn1-1, rn2-1, rn3-1]
+
+##########################################################################################################################
+
+from math import inf
+
+# Input Arguments for Ranking & Crowding Distance calculation
+# F : The list of objective functions
+# X_in : The sample population in the form of 2D list of dimension X_in[pop_size][num_of_params]
+# Rest are self-explanatory
+
+class Individual:
+    def __init__(self, idx, X, F):
+        self.id = idx
+        self.X = X # Coefficient matrix of the individual vector
+        self.F = F # Solution Matrix of the Individual (for all objectives)
+
+        self.sp = [] # Set of individuals dominated by this individual
+        self.np = 0 # Number of individuals that dominate this individual
+
+        self.rank = 0
+        self.crowding_distance = 0
+
+    def __repr__(self):
+        return repr(())
+
+
+def ranking(F, X_in):
+    # F is a 2D list, with elements as [Objective][Individual]
+    # F[i][j] implies the value of the (i)th objective for the (j)th individual
+    front = 1
+    Fronts = dict(
+        [(front, [])]
+    )
+
+    num_objectives = len(F[0])
+    pop_size = len(X_in)
+
+
+    individuals = []
+    for i in range(0, pop_size, 1):
+        individuals.append(Individual(i, X_in[i], F[i]))
+        individuals[i].sp = []
+        individuals[i].np = 0
+
+    for i in range(0, pop_size, 1):
+        for j in range(0, pop_size, 1):
+            less_d = 0
+            equal_d = 0
+            more_d = 0
+            for k in range(0, num_objectives, 1):
+                if F[i][k]>F[j][k]:
+                    less_d  = less_d  + 1
+                elif F[i][k] == F[j][k]:
+                    equal_d = equal_d + 1
+                else:
+                    more_d = more_d + 1
+
+            if (less_d==0) & (equal_d != num_objectives):
+                individuals[i].sp.append(j)
+
+            elif (more_d==0) & (equal_d != num_objectives):
+                individuals[i].np = individuals[i].np + 1
+
+        if individuals[i].np == 0:
+            individuals[i].rank = 1
+            Fronts[front].append(i)
+            front_mem = Fronts[front]
+            dat = dict(
+                [(front,front_mem)]
+            )
+            Fronts.update(dat)
+
+    while Fronts[front]:
+        buff = []
+        for i in range(0, len(Fronts[front])):
+            if individuals[Fronts[front][i]].sp:
+                for j in range(0,len(individuals[Fronts[front][i]].sp), 1):
+                    individuals[individuals[Fronts[front][i]].sp[j]].np = \
+                        individuals[individuals[Fronts[front][i]].sp[j]].np - 1
+
+                    if individuals[individuals[Fronts[front][i]].sp[j]].np == 0:
+                        individuals[individuals[Fronts[front][i]].sp[j]].rank = front +1
+                        buff.append(individuals[Fronts[front][i]].sp[j])
+
+
+        front  = front + 1
+        Fronts[front] = buff
+
+    individuals = crowding_distance(Fronts, individuals, num_objectives)
+
+    return [Fronts, individuals]
+
+
+
+def crowding_distance(fronts, individuals, num_objectives):
+
+
+    for front in fronts:
+        for objective in range(0, num_objectives, 1):
+            front_indivs_unsorted = fronts[front]
+            sorter_dict = {}
+            for i in front_indivs_unsorted:
+                sorter_dict[i] = individuals[i].F[objective]
+
+            front_indivs_sorted = sorted(sorter_dict, key=sorter_dict.__getitem__, \
+                                                             reverse= False)
+
+
+            len_front_indiv = len(front_indivs_sorted)
+            if len_front_indiv > 2:
+                individuals[front_indivs_sorted[0]].crowding_distance = \
+                    individuals[front_indivs_sorted[len_front_indiv-1]].crowding_distance = inf
+
+                f_max = individuals[front_indivs_sorted[len_front_indiv - 1]].F[objective]
+                f_min = individuals[front_indivs_sorted[0]].F[objective]
+
+                for i in range(1, len_front_indiv - 1, 1):
+                    prev_indiv_val = individuals[front_indivs_sorted[i - 1]].F[objective]
+                    next_indiv_val = individuals[front_indivs_sorted[i + 1]].F[objective]
+                    if f_max != f_min:
+                        individuals[front_indivs_sorted[i]].crowding_distance = \
+                            individuals[front_indivs_sorted[i]].crowding_distance + \
+                            ((next_indiv_val - prev_indiv_val) / (f_max - f_min))
+                    else:
+                        individuals[front_indivs_sorted[i]].crowding_distance = inf
+
+
+    return individuals
+
+##########################################################################################################################
+
+def selection(num_obj, X_trial, X_target, pop_size):
+    X_sel = [[0 for x in range(len(X_trial[0]))] for y in range(pop_size)]
+    for i in range(0, pop_size, 1):
+        trial_wins = 0
+        for j in range(0, num_obj,1):
+            trial_F_val = evaluate(j, X_trial[i])
+            target_F_val = evaluate(j, X_target[i])
+            if trial_F_val < target_F_val:
+                trial_wins = 1
+
+        if  trial_wins == 1:
+            X_sel[i] = X_trial[i]
+
+        else:
+            X_sel[i] = X_target[i]
+
+    return X_sel
+##########################################################################################################################
+
+def evaluate(obj_index, x_input):
+    # ZDT4 Problem
+    X = x_input
+    F = [0, 0]
+
+
+
+    # E = [[10, 1/10], [11, 1/12], [12, 1/15], [13, 1/20], [14, 1/25], [15, 1/35], [16, 1/40], [17, 1/42], [18, 1/43], [19, 1/48], [20, 1/52],
+    #      [21, 1/56], [22, 1/54], [23, 1/52], [24, 1/53], [25, 1/58], [26, 1/59], [27, 1/58], [28, 1/54], [29, 1/56], [30, 1/54], [31, 1/52],
+    #      [32, 1/54], [33, 1/55], [34, 1/56], [35, 1/58], [36, 1/59], [37, 1/60], [38, 1/62], [39, 1/63], [40, 1/64], [41, 1/64], [42, 1/62],
+    #      [43, 1/63], [44, 1/67], [45, 1/67], [46, 1/68], [47, 1/63], [48, 1/62], [49, 1/61], [50, 1/60], [51, 1/56], [52, 1/54]]
+
+    # E_dict = {}
+    # for i in range(0, len(E), 1):
+    #     E_dict[E[i][0]] = E[i][1]
+
+    F[0] = round(X[0])
+    # F[1] is the Accuracy Value
+    F[1] = get_accuracy(round(X[0]))
+
+
+    return F[obj_index]
+
+##########################################################################################################################
 
 # Un-comment the following code to test:
 def main():
     op = Optimizer()
-    op.population_size = 1
-    op.max_generations = 1
-    op.num_params = 1
+    op.population_size = 50
+    op.max_generations = 400
+    op.num_params = 10
     op.num_objectives = 2
 
     # Define the objectives in the "Optimizer" class
