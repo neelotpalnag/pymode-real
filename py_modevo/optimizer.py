@@ -19,6 +19,8 @@ from operations.elitism import elitism
 from operations.evaluate import evaluate
 from operations.pareto_tools import ranking
 
+import matplotlib.pyplot as plotter
+
 
 # Specify the Objective Functions in a Matrix format
 # For objective function matrix F(x) = [F1(x), F2(x) ... Fk(x)], where x = [x1, x2,x3 ..., xn]
@@ -38,8 +40,8 @@ class Optimizer:
         # List of Objective Functions : Set in ./evaluate
 
 
-        self.X_lo = [0, -5, -5, -5, -5, -5, -5, -5, -5, -5]          # List of Upper bounds of Xi's  #   Must be set by user
-        self.X_hi = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]          # List of Lower bounds of Xi's  #   Must be set by user
+        self.X_lo = [10]        # List of Upper bounds of Xi's  #   Must be set by user
+        self.X_hi = [52]          # List of Lower bounds of Xi's  #   Must be set by user
 
         self.crossover_prob = 0.3   # Default  = 0.3 ; Increase to 0.9 for quick convergence, or else to 0.1
 
@@ -54,35 +56,76 @@ class Optimizer:
                 X_parent = X_init
                 # print(X_init)
 
-                for i in range(0, self.max_generations, 1):
-                    print("GENERATION : " + str(i))
+                E = [[10, 10], [11, 12], [12, 15], [13, 20], [14, 25], [15, 35], [16, 40], [17, 42], [18, 43], [19, 48],
+                     [20, 52],
+                     [21, 56], [25, 58], [26, 59], [36, 59], [37, 60], [38, 62], [39, 63], [40, 64], [41, 64], [44, 67],
+                     [45, 67]]
 
-                    # STEP 2: Mutation
-                    X_mutated = mutate(X_parent, self.X_hi, self.X_lo, self.population_size)
-                    # print(X_mutated)
+                # for i in range(0, self.max_generations, 1):
+                #     print("GENERATION : " + str(i))
+                #
+                #     # STEP 2: Mutation
+                #     X_mutated = mutate(X_parent, self.X_hi, self.X_lo, self.population_size)
+                #     # print(X_mutated)
+                #
+                #     # STEP 3: Crossover
+                #     X_crossed = cross_binary(X_parent, X_mutated, self.crossover_prob, self.X_hi, self.X_lo,
+                #                              self.population_size)
+                #     # print(X_crossed)
+                #
+                #     # STEP 4: Selection
+                #     X_sel = selection(self.num_objectives, X_crossed, X_parent, self.population_size)
+                #     # Uncomment the following lines to output daughter population values at every generation
+                #     # print(X_sel)
+                #
+                #     # STEP 5: Elitism
+                #     X_elite = elitism(self.num_objectives, X_parent, X_sel)
+                #     # print("ELITE: " + str(X_elite))
+                #
+                #     X_parent = X_elite[0][:self.population_size]
+                #
+                # print(str(self.max_generations) + " generations ended. Computing result ..")
+                # print(X_parent)
+                #
+                # # Generate file for pareto generation:
+                # Pareto_front = X_elite[1]
+                # print("Pareto front: " + str(Pareto_front))
 
-                    # STEP 3: Crossover
-                    X_crossed = cross_binary(X_parent, X_mutated, self.crossover_prob, self.X_hi, self.X_lo,
-                                             self.population_size)
-                    # print(X_crossed)
+                # # Generate the Pareto plot for the two objectives :
+                # AXIS_X = [0 for t in range(0, len(Pareto_front[1]), 1)]
+                # AXIS_Y = [0 for t in range(0, len(Pareto_front[1]), 1)]
+                # res = open("zdt4.txt", 'w')
 
-                    # STEP 4: Selection
-                    X_sel = selection(self.num_objectives, X_crossed, X_parent, self.population_size)
-                    # Uncomment the following lines to output daughter population values at every generation
-                    # print(X_sel)
+                # for i in range(0, len(Pareto_front[1]), 1):
+                #     AXIS_X[i] = (evaluate(0, X_elite[0][Pareto_front[1][i]]))
+                #     AXIS_Y[i] = (evaluate(1, X_elite[0][Pareto_front[1][i]]))
+                #     res.write(str(AXIS_X[i]) + "," + str(AXIS_Y[i]) + "\n")
+                #
+                # # Print the Plot
+                # plotter.plot(AXIS_Y, AXIS_X)
+                # plotter.show()
+                # res.close()
 
-                    # STEP 5: Elitism
-                    X_elite = elitism(self.num_objectives, X_parent, X_sel)
-                    # print("ELITE: " + str(X_elite))
 
-                    X_parent = X_elite[0][:self.population_size]
+                RES = elitism(self.num_objectives, [[10], [11], [12], [13], [14], [15], [16], [17] ],
+                              [[21], [25], [26], [27], [28], [29], [30], [31]] )
 
-                print(str(self.max_generations) + " generations ended. Computing result ..")
-                print(X_parent)
+                print(RES[0])
+                print(RES[1])
 
-                # Generate file for pareto generation:
-                Pareto_front = X_elite[1]
-                print("Pareto front: " + str(Pareto_front))
+
+                AXIS_X = []
+                AXIS_Y = []
+
+                for i in range(0, len(E), 1):
+                    AXIS_X.append(E[i][0])
+                    AXIS_Y.append(E[i][1])
+
+
+                    # Print the Plot
+                plotter.plot(AXIS_Y, AXIS_X)
+                # plotter.show()
+
 
             else:
                 # Proceed with Single-Objective Optimization if um_objectives = 1
@@ -134,9 +177,9 @@ class Optimizer:
 # Un-comment the following code to test:
 def main():
     op = Optimizer()
-    op.population_size = 50
-    op.max_generations = 500
-    op.num_params = 10
+    op.population_size = 1
+    op.max_generations = 1
+    op.num_params = 1
     op.num_objectives = 2
 
     # Define the objectives in the "Optimizer" class

@@ -21,9 +21,10 @@ def elitism(num_obj, X_parent, X_daughter):
 
     [Fronts, Individuals] = ranking(F_evaluated, X_pool)
 
+
     # elite_population = [[0 for x in range(0, num_params, 1)] for y in range(pop_size)]
     elite_population = []
-    counter = pop_size
+    counter = 2*pop_size
     for front in Fronts:
         front_size = len(Fronts[front])
         if front_size<=counter:
@@ -43,7 +44,7 @@ def elitism(num_obj, X_parent, X_daughter):
             for i in range(0, counter, 1):
                 elite_population.append(Individuals[buf[i]].X)
 
-    return [elite_population[:pop_size], Fronts]
+    return [elite_population, Fronts]
 
 
 
