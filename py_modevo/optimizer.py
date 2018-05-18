@@ -13,7 +13,7 @@
 
 from operations.initialization import initialize
 from operations.mutation import mutate
-from operations.crossover_binary import cross_binary
+from operations.crossover_binomial import cross_binomial
 from operations.selection import selection
 from operations.elitism import elitism
 from operations.evaluate import evaluate
@@ -62,7 +62,7 @@ class Optimizer:
                     # print(X_mutated)
 
                     # STEP 3: Crossover
-                    X_crossed = cross_binary(X_parent, X_mutated, self.crossover_prob, self.X_hi, self.X_lo,
+                    X_crossed = cross_binomial(X_parent, X_mutated, self.crossover_prob, self.X_hi, self.X_lo,
                                              self.population_size)
                     # print(X_crossed)
 
