@@ -43,36 +43,36 @@ class Optimizer:
 
         self.crossover_prob = 0.3   # Default  = 0.3 ; Increase to 0.9 for quick convergence, or else to 0.1
 
-
     def solve(self):
         # STEP 1: Generate the INITIAL POPULATION
-        X_init = initialize(self.X_hi, self.X_lo, self.population_size)
+        X_init = initialize(self.X_hi, self.X_lo, self.population_size, self.num_objectives)
 
-        if self.secure_expression_check() is True:
+        if True:
             if self.num_objectives >= 2:
                 # Proceed with multi-objective optimization only if num_objectives >=2
                 X_parent = X_init
                 # print(X_init)
 
                 for i in range(0, self.max_generations, 1):
-                    print("GENERATION : " + str(i))
+                    print("GENERATION : " + str(i + 1))
 
                     # STEP 2: Mutation
-                    X_mutated = mutate(X_parent, self.X_hi, self.X_lo, self.population_size, seed_gen=i)
+                    X_mutated = mutate(X_parent, self.X_hi, self.X_lo, self.num_objectives, self.population_size,
+                                       seed_gen=i)
                     # print(X_mutated)
 
                     # STEP 3: Crossover
                     X_crossed = cross_binomial(X_parent, X_mutated, self.crossover_prob, self.X_hi, self.X_lo,
-                                             self.population_size)
+                                               self.population_size, self.num_objectives)
                     # print(X_crossed)
 
                     # STEP 4: Selection
-                    X_sel = selection(self.num_objectives, X_crossed, X_parent, self.population_size)
+                    X_sel = selection(self.num_objectives, X_crossed, X_parent, self.population_size, self.num_params)
                     # Uncomment the following lines to output daughter population values at every generation
                     # print(X_sel)
 
                     # STEP 5: Elitism
-                    ELITISM_RES = elitism(self.num_objectives, X_parent, X_sel)
+                    ELITISM_RES = elitism(self.num_objectives, X_parent, X_sel, self.num_params)
                     # print("ELITE: " + str(X_elite))
 
                     X_parent = ELITISM_RES[0][:self.population_size]
@@ -101,7 +101,7 @@ class Optimizer:
                 res.close()
 
                 # Print the Plot
-                plotter.plot(AXIS_Y, AXIS_X)
+                plotter.scatter(AXIS_Y, AXIS_X)
                 plotter.show()
 
 
@@ -123,8 +123,8 @@ class Optimizer:
 # Un-comment the following code to test:
 def main():
     op = Optimizer()
-    op.population_size = 100
-    op.max_generations = 800
+    op.population_size = 80
+    op.max_generations = 400
     op.num_params = 10
     op.num_objectives = 2
 
