@@ -43,7 +43,7 @@ def elitism(num_obj, X_parent, X_daughter):
             for i in range(0, counter, 1):
                 elite_population.append(Individuals[buf[i]].X)
 
-    return [elite_population[:pop_size], Fronts]
+    return [elite_population[:pop_size], Fronts, F_evaluated]
 
 
 

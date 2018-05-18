@@ -16,8 +16,8 @@ from operations.mutation import mutate
 from operations.crossover_binomial import cross_binomial
 from operations.selection import selection
 from operations.elitism import elitism
-from operations.evaluate import evaluate
-from operations.pareto_tools import ranking
+
+from matplotlib import pyplot as plotter
 
 
 # Specify the Objective Functions in a Matrix format
@@ -58,7 +58,7 @@ class Optimizer:
                     print("GENERATION : " + str(i))
 
                     # STEP 2: Mutation
-                    X_mutated = mutate(X_parent, self.X_hi, self.X_lo, self.population_size)
+                    X_mutated = mutate(X_parent, self.X_hi, self.X_lo, self.population_size, seed_gen=i)
                     # print(X_mutated)
 
                     # STEP 3: Crossover
@@ -72,17 +72,37 @@ class Optimizer:
                     # print(X_sel)
 
                     # STEP 5: Elitism
-                    X_elite = elitism(self.num_objectives, X_parent, X_sel)
+                    ELITISM_RES = elitism(self.num_objectives, X_parent, X_sel)
                     # print("ELITE: " + str(X_elite))
 
-                    X_parent = X_elite[0][:self.population_size]
+                    X_parent = ELITISM_RES[0][:self.population_size]
 
                 print(str(self.max_generations) + " generations ended. Computing result ..")
                 print(X_parent)
 
                 # Generate file for pareto generation:
-                Pareto_front = X_elite[1]
+                Pareto_front = ELITISM_RES[1]
                 print("Pareto front: " + str(Pareto_front))
+
+                # Print the Front / Generate Graph
+
+                F_EVAL = ELITISM_RES[2]
+
+                # Generate the Pareto plot for the two objectives :
+                AXIS_X = [0 for t in range(0, len(Pareto_front[1]), 1)]
+                AXIS_Y = [0 for t in range(0, len(Pareto_front[1]), 1)]
+                res = open("zdt4.txt", 'w')
+
+                for i in range(0, len(Pareto_front[1]), 1):
+                    AXIS_X[i] = (F_EVAL[Pareto_front[1][i]][0])
+                    AXIS_Y[i] = (F_EVAL[Pareto_front[1][i]][1])
+                    res.write(str(AXIS_X[i]) + "," + str(AXIS_Y[i]) + "\n")
+
+                res.close()
+
+                # Print the Plot
+                plotter.plot(AXIS_Y, AXIS_X)
+                plotter.show()
 
 
     # TODO: Eliminate or Fix
@@ -103,8 +123,8 @@ class Optimizer:
 # Un-comment the following code to test:
 def main():
     op = Optimizer()
-    op.population_size = 50
-    op.max_generations = 500
+    op.population_size = 100
+    op.max_generations = 800
     op.num_params = 10
     op.num_objectives = 2
 
