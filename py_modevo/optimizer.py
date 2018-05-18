@@ -85,22 +85,6 @@ class Optimizer:
                 print("Pareto front: " + str(Pareto_front))
 
 
-                print(str(self.max_generations) + " generations ended. Computing result ..")
-
-
-                print("\n \n The Optimal solution for the given objective is :")
-                best_value = evaluate(X_evo[0])
-                best_member_index = 0
-                for solution in range(1, self.population_size, 1):
-                    X = X_evo[solution]
-                    this_value = evaluate(X_evo[0])
-                    if this_value<best_value:
-                        best_value = this_value
-                        best_member_index = solution
-
-                print("Optimal Value: " + str(best_value) + " \n Best Solution: " + str(X_evo[best_member_index]))
-
-
     # TODO: Eliminate or Fix
     def secure_expression_check(self):
         # safety_checklist = ["sudo", "su", "rm", "del", "dir", "dd", "mv", "git",
